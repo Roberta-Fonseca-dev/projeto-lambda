@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Template para Lambda + S3
+
+Resources:
+  MeuBucketS3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: desafio-lambda-s3-exemplo
+
+  MinhaFuncaoLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: ProcessaArquivosS3
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.9
+      Role: arn:aws:iam::123456789012:role/lambda-execution-role
+      Code:
+        S3Bucket: meu-bucket-codigo
+        S3Key: lambda_function.zip
+
+  PermissaoS3Lambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref MinhaFuncaoLambda
+      Principal: s3.amazonaws.com
+      SourceArn: !GetAtt MeuBucketS3.Arn
